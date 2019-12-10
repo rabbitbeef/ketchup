@@ -1,1 +1,4 @@
 /stamps/*.txt
+/dist/
+/build/
+__pycache__
