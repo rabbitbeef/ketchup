@@ -40,7 +40,6 @@ class TomatoStamp:
         self.executor_timer.shutdown()
         self.executor_timer = concurrent.futures.ThreadPoolExecutor(max_workers=1)
         self.TextBox.putSelfStamp("[reset]")
-        self.TextBox.putBreakLast()
     
     #タイマーの種類毎に設定を切り分ける
     #NOTE:タイマーの設定の種類を追加するときはこの関数を変更
@@ -71,9 +70,10 @@ class TomatoStamp:
     def submitTimer(self,interval,timelimit,EndMsg,timer_type):    
         self.executor_timer.submit(self.timer,interval,timelimit,EndMsg,timer_type,self.Editbox,self.Tkinter)
     
-    #タイマー開始時のタイマー以外への行動
+    #タイマー開始時の行動
     def timerBegginAction(self,timer_type):
         if(self.TextBox != None):    
+            self.TextBox.putBreakLast()
             self.TextBox.putSelfStamp('['+timer_type+']')
     
     #タイマーが正常終了した時の行動
@@ -81,7 +81,6 @@ class TomatoStamp:
     def timerEndAction(self,timer_type):
         if(self.TextBox != None):
             self.TextBox.putSelfStamp('['+timer_type+':End]')
-            self.TextBox.putBreakLast()
         
     #タイマー関数。
     def timer(self,interval, limits_min ,EndMsg ,timer_type,  Editbox = None,tkinter = None):
@@ -91,7 +90,13 @@ class TomatoStamp:
         self.timerBegginAction(timer_type)
 
         first = time.time()
-        end = first + 60 * limits_min - 1
+        #NOTE:更新間隔(interval)が１秒の場合、0.005を足さないと、１秒飛ばして表示されるので違和感がある。
+        #     初期の処理が僅かに１秒以上かかるためだと思われる。
+        #     0.005を足して表示の時間を僅かにずらして回避。
+        #     これでも計算時間の誤差によっては、たまに表示される時間が１秒飛ぶ恐れがあるので、
+        #     更新間隔を短くしてもよかったが、0.005秒と途中からの１秒飛ばしは人間の間隔では誤差レベルなのと、
+        #     PCとしてはすこしでも負荷が少ない方をここでは選択した。
+        end = first + 60 * limits_min+0.005
         now = now = time.time()
         next = 0
         
@@ -109,7 +114,7 @@ class TomatoStamp:
             sec = math.floor(past % 60)
             
             #出力用の文章成形
-            string = '{minuite}:{second}'.format(minuite=time_min, second=sec)
+            string = '{minutes}:{second}'.format(minutes=time_min, second=sec)
             
             #tkinterとEditboxの両方がセットされていればEditboxに出力する。そうでなければprint
             if(Editbox and tkinter):

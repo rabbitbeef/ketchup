@@ -1,0 +1,16 @@
+[{
+        "name": "tomato",
+        "TimeLimit": 25,
+        "EndMsg": "Tomato has ended."
+    },
+    {
+        "name": "LongBreak",
+        "TimeLimit": 15,
+        "EndMsg": "Long break has ended."
+    },
+    {
+        "name": "ShortBreak",
+        "TimeLimit": 5,
+        "EndMsg": "Short break has ended."
+    },
+]
